@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0508">
+<title>Tentaciones Íntimas</title>
+<style>
+:root{
+  --negro:#0a0508;--burdeos:#5a0f23;--pasion:#c4122f;--granate:#7b1230;--purpura:#2b0a3d;--oro:#d4af6a;--oro2:#f3dca0;--crema:#f6e9d7;
+  --display:'Playfair Display','Bodoni 72','Didot','Bodoni MT',Georgia,serif;
+  --body:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--negro);color:var(--crema);font-family:var(--body);overflow:hidden}
+body{background:radial-gradient(ellipse at 50% 0%,#3a0a1d 0%,var(--negro) 60%),var(--negro)}
+.screen{position:fixed;inset:0;height:100vh;height:100dvh;display:none;flex-direction:column;align-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) calc(env(safe-area-inset-right,0px) + 14px) calc(env(safe-area-inset-bottom,0px) + 12px) calc(env(safe-area-inset-left,0px) + 14px);
+  overflow-y:auto;overflow-x:hidden}
+.screen.on{display:flex;animation:fin .6s ease both}
+@keyframes fin{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:none}}
+.gold{background:linear-gradient(180deg,var(--oro2),var(--oro) 55%,#9c7a38);-webkit-background-clip:text;background-clip:text;color:transparent}
+.btn{font-family:var(--display);letter-spacing:.12em;font-weight:700;border:1px solid var(--oro);color:var(--oro2);
+  background:linear-gradient(180deg,var(--pasion),var(--burdeos));border-radius:999px;padding:16px 28px;font-size:1.05rem;cursor:pointer;
+  width:100%;max-width:420px;min-height:54px;box-shadow:0 0 22px rgba(196,18,47,.45),inset 0 1px 0 rgba(255,255,255,.25);text-transform:uppercase}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.35;filter:grayscale(.6);cursor:not-allowed;box-shadow:none}
+.btn.ghost{background:transparent;box-shadow:none}
+
+/* INICIO */
+#s-inicio{justify-content:flex-start}
+.wrap{width:100%;max-width:460px;margin:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:8px 0}
+.ornam{color:var(--oro);letter-spacing:.5em;font-size:1rem}
+h1.tit{margin:0;text-align:center;font-family:var(--display);font-style:italic;font-weight:800;line-height:.95;font-size:clamp(2.4rem,13vw,4rem);
+  text-shadow:0 0 30px rgba(196,18,47,.5)}
+h1.tit span{display:block;font-size:.8em}
+.campo{width:100%;display:flex;align-items:center;gap:10px;background:rgba(43,10,61,.55);border:1px solid rgba(212,175,106,.5);border-radius:14px;padding:6px 12px}
+.campo b{font-size:1.7rem;color:var(--oro);width:1.4em;text-align:center}
+.campo label{display:block;font-size:.72rem;color:var(--oro);letter-spacing:.08em}
+.campo input{width:100%;background:transparent;border:0;outline:0;color:var(--crema);font-size:1.1rem;padding:6px 0;font-family:var(--body)}
+.campo:focus-within{box-shadow:0 0 0 2px var(--pasion)}
+.desc{font-size:.92rem;line-height:1.5;color:#e9d8c4;background:rgba(0,0,0,.35);border:1px solid rgba(212,175,106,.3);border-radius:14px;padding:14px}
+.desc h2{margin:0 0 6px;font-family:var(--display);color:var(--oro2);font-size:1.15rem}
+.desc p{margin:0 0 8px}.desc p:last-child{margin:0}
+.col{width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
+
+/* TABLERO */
+#s-juego{justify-content:space-between;gap:8px;overflow:hidden}
+.top{width:100%;max-width:720px;text-align:center}
+.top h2{margin:0;font-family:var(--display);font-style:italic;font-size:1.5rem}
+.chips{display:flex;gap:8px;margin-top:6px}
+.chip{flex:1;border:1px solid rgba(212,175,106,.35);border-radius:14px;padding:7px 8px;background:rgba(43,10,61,.5);transition:.4s;opacity:.65;min-width:0}
+.chip.act{opacity:1;border-color:var(--oro);box-shadow:0 0 18px rgba(196,18,47,.7);background:linear-gradient(180deg,rgba(196,18,47,.35),rgba(43,10,61,.6))}
+.chip .n{font-family:var(--display);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip .n i{color:var(--oro);font-style:normal;margin-right:4px}
+.chip .t{font-size:.72rem;color:var(--oro2)}
+.bar{height:5px;border-radius:5px;background:rgba(255,255,255,.12);margin-top:4px;overflow:hidden}
+.bar div{height:100%;width:0;background:linear-gradient(90deg,var(--pasion),var(--oro));transition:width .6s}
+.turno{margin-top:8px;font-size:.95rem;color:var(--oro2)}
+.menu{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);right:calc(env(safe-area-inset-right,0px) + 10px);background:transparent;border:1px solid rgba(212,175,106,.4);color:var(--oro);border-radius:10px;font-size:.7rem;padding:6px 8px;cursor:pointer}
+.mesa{flex:1;min-height:0;width:100%;max-width:560px;display:flex;align-items:center;justify-content:center}
+.tablero{width:100%;aspect-ratio:1/1.05;max-height:100%;border-radius:26px;padding:3.5%;
+  background:radial-gradient(ellipse at 50% 40%,#4a0c22,#1d0612 70%);border:2px solid var(--oro);
+  box-shadow:0 0 0 5px #120309,0 0 0 6px rgba(212,175,106,.5),0 20px 50px rgba(0,0,0,.7),inset 0 0 60px rgba(0,0,0,.7);
+  display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:1fr 1fr;gap:3.5%;position:relative}
+.pile{grid-column:span 2;position:relative;cursor:default;border-radius:12px;min-height:0}
+.pile:nth-child(4){grid-column:2/4}.pile:nth-child(5){grid-column:4/6}
+.pile .deck{position:absolute;inset:0;border-radius:12px;--c:var(--oro);
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0 6px,transparent 6px 12px),linear-gradient(160deg,#2a0a1a,#0d0309);
+  border:2px solid var(--c);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:.18s;
+  box-shadow:3px 3px 0 -1px #1a0610,3px 3px 0 0 var(--c),6px 6px 0 -1px #130409,6px 6px 0 0 rgba(212,175,106,.35),0 8px 16px rgba(0,0,0,.6)}
+.pile svg{width:56%;max-height:58%;filter:drop-shadow(0 0 5px var(--c))}
+.pile .nm{font-family:var(--display);font-weight:700;font-size:clamp(.55rem,2.8vw,.82rem);letter-spacing:.1em;color:var(--c)}
+.pile.lit .deck{transform:translateY(-4px) scale(1.06);background:linear-gradient(160deg,#5a1230,#1a0610);box-shadow:0 0 30px var(--c),0 0 8px #fff3 inset,0 10px 20px rgba(0,0,0,.7);z-index:2}
+.pile.chosen .deck{animation:pulso .8s ease-in-out infinite alternate;z-index:3}
+@keyframes pulso{to{transform:translateY(-6px) scale(1.1);box-shadow:0 0 44px var(--c),0 0 14px var(--c)}}
+.bottom{width:100%;display:flex;justify-content:center;padding-top:4px}
+
+/* TARJETA */
+#carta{position:fixed;inset:0;z-index:20;display:none;flex-direction:column;align-items:center;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) calc(env(safe-area-inset-right,0px) + 14px) calc(env(safe-area-inset-bottom,0px) + 12px) calc(env(safe-area-inset-left,0px) + 14px);
+  background:rgba(5,1,4,.88);height:100vh;height:100dvh}
+#carta.on{display:flex;animation:fin .35s both}
+.quien{font-family:var(--display);text-align:center;font-size:1.3rem;color:var(--oro2);text-shadow:0 0 14px var(--pasion)}
+.quien small{display:block;font-family:var(--body);font-size:.75rem;color:var(--oro);letter-spacing:.1em}
+.persp{flex:1;min-height:0;width:100%;max-width:480px;perspective:1400px}
+.flip{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.3,.7,.2,1);transform:rotateY(180deg) scale(.8)}
+.flip.go{transform:rotateY(0) scale(1)}
+.face{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:3px double var(--c);overflow:hidden}
+.back{transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 6px,transparent 6px 12px),linear-gradient(160deg,#3a0d22,#0d0309)}
+.back svg{width:45%;filter:drop-shadow(0 0 10px var(--c))}
+.front{background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--c) 30%,#1a0610),#12040b 75%);box-shadow:0 0 40px color-mix(in srgb,var(--c) 60%,transparent);display:flex;flex-direction:column}
+.cat{text-align:center;padding:10px;font-family:var(--display);font-weight:800;letter-spacing:.35em;color:#120309;background:var(--c);font-size:.9rem;flex:none}
+.scroll{flex:1;min-height:0;overflow-y:auto;padding:16px 18px 20px;-webkit-overflow-scrolling:touch}
+.scroll h3{margin:0 0 12px;font-family:var(--display);font-size:clamp(1.4rem,6.5vw,1.9rem);line-height:1.15;color:var(--oro2);text-align:center}
+.scroll p{margin:0 0 11px;font-size:1.02rem;line-height:1.5;color:#f3e6d6}
+.scroll p.lead{font-style:italic;color:var(--oro2);font-size:1.08rem}
+.scroll.corto{display:flex;flex-direction:column;justify-content:center}
+.scroll.corto h3{font-size:clamp(1.7rem,8vw,2.3rem)}
+#cerrar,#descargas{opacity:0;pointer-events:none;transition:opacity .5s}
+#cerrar.on,#descargas.on{opacity:1;pointer-events:auto}
+#descargas{display:flex;gap:8px;width:100%;max-width:480px}
+#descargas[hidden]{display:none}
+#descargas .btn{padding:11px 8px;font-size:.78rem;min-height:46px;letter-spacing:.06em}
+
+/* FINAL */
+#s-fin{justify-content:center;text-align:center;background:radial-gradient(ellipse at 50% 30%,#5a0f23,#0a0508 70%)}
+#s-fin h2{font-family:var(--display);font-style:italic;font-size:clamp(2rem,10vw,3.2rem);margin:0 0 10px}
+#s-fin p{max-width:460px;line-height:1.55;margin:0 0 12px;font-size:1.02rem}
+.rul{font-family:var(--display);font-weight:700;color:var(--oro2);border-bottom:2px solid var(--oro);padding:0 2px;text-decoration:none}
+a.rul{cursor:pointer}span.rul{opacity:.9}
+.fx{position:fixed;top:-20px;pointer-events:none;z-index:30;animation:cae linear forwards}
+@keyframes cae{to{transform:translateY(110vh) rotate(540deg);opacity:.2}}
+.chispa{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:25;animation:chi .9s ease-out forwards;background:var(--oro2);box-shadow:0 0 8px var(--oro)}
+@keyframes chi{to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+
+/* MODAL */
+#modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px}
+#modal.on{display:flex}
+#modal .box{width:100%;max-width:380px;background:linear-gradient(160deg,#2b0a3d,#14040c);border:1px solid var(--oro);border-radius:18px;padding:20px;text-align:center}
+#modal p{margin:0 0 16px;line-height:1.45}
+#modal .row{display:flex;gap:10px}
+#modal .btn{padding:12px;font-size:.85rem;min-height:46px}
+@media (prefers-reduced-motion:reduce){.flip{transition-duration:.01s}.screen.on,#carta.on{animation:none}.pile.chosen .deck{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- PANTALLA DE INICIO -->
+<section id="s-inicio" class="screen">
+  <div class="wrap">
+    <div class="ornam">❦ ♥ ❦</div>
+    <h1 class="tit gold">TENTACIONES<span>ÍNTIMAS</span></h1>
+    <div class="ornam">🌹 💋 🔥 💋 🌹</div>
+
+    <div id="guardada" class="col" hidden>
+      <button class="btn" id="b-continuar">Continuar partida</button>
+      <button class="btn ghost" id="b-nueva">Nueva partida</button>
+    </div>
+
+    <div id="formulario" class="col">
+      <div class="campo"><b>♀</b><div style="flex:1"><label for="n1">JUGADOR 1</label><input id="n1" maxlength="20" autocomplete="off" placeholder="Nombre"></div></div>
+      <div class="campo"><b>♂</b><div style="flex:1"><label for="n2">JUGADOR 2</label><input id="n2" maxlength="20" autocomplete="off" placeholder="Nombre"></div></div>
+      <button class="btn" id="b-iniciar" disabled>Iniciar partida</button>
+    </div>
+
+    <div class="desc">
+      <h2>🔥 TENTACIONES ÍNTIMAS</h2>
+      <p>Un juego para parejas que quieren romper la rutina, despertar el deseo y descubrir nuevas formas de disfrutar juntos.</p>
+      <p>A través de preguntas atrevidas, retos sensuales y vales llenos de tentación, pondréis a prueba vuestra complicidad, compartiréis fantasías y os atreveréis a explorar vuestro lado más íntimo.</p>
+      <p>Dejaos llevar, sorprendeos y, sobre todo, disfrutad sin prisas. Porque esta noche… ¡la única regla es dejar volar vuestra imaginación! 😈</p>
+    </div>
+  </div>
+</section>
+
+<!-- TABLERO -->
+<section id="s-juego" class="screen">
+  <button class="menu" id="b-menu">Nueva partida</button>
+  <div class="top">
+    <h2 class="gold">Tentaciones Íntimas</h2>
+    <div class="chips">
+      <div class="chip" id="c0"><div class="n"><i>♀</i><span></span></div><div class="t"></div><div class="bar"><div></div></div></div>
+      <div class="chip" id="c1"><div class="n"><i>♂</i><span></span></div><div class="t"></div><div class="bar"><div></div></div></div>
+    </div>
+    <div class="turno" id="turno"></div>
+  </div>
+  <div class="mesa"><div class="tablero" id="tablero"></div></div>
+  <div class="bottom"><button class="btn" id="b-tirada">¡Realizar tirada!</button></div>
+</section>
+
+<!-- TARJETA -->
+<section id="carta">
+  <div class="quien" id="quien"></div>
+  <div class="persp"><div class="flip" id="flip">
+    <div class="face back" id="dorso"></div>
+    <div class="face front"><div class="cat" id="cat"></div><div class="scroll" id="scroll"></div></div>
+  </div></div>
+  <div id="descargas" hidden>
+    <button class="btn ghost" id="d-img">📷 Guardar imagen</button>
+    <button class="btn ghost" id="d-pdf">📄 Guardar PDF</button>
+  </div>
+  <button class="btn" id="cerrar">Volver a la partida</button>
+</section>
+
+<!-- FINAL -->
+<section id="s-fin" class="screen">
+  <div class="wrap">
+    <h2 class="gold">🔥 ¡JUEGO TERMINADO!</h2>
+    <p>¡Habéis llegado al final de Tentaciones Íntimas! Pero que termine el juego no significa que tenga que terminar la diversión…</p>
+    <p>Ahora tenéis vía libre para continuar vuestra noche como más os apetezca, dejaros llevar por vuestros deseos y disfrutar juntos de todo lo que habéis despertado durante la partida.</p>
+    <p id="p-ruleta"></p>
+    <p>Las cartas ya han hablado… ahora os toca a vosotros escribir el final. 😈</p>
+    <button class="btn ghost" id="b-fin-nueva">Nueva partida</button>
+  </div>
+</section>
+
+<div id="modal"><div class="box"><p id="m-txt"></p><div class="row"><button class="btn ghost" id="m-no">Cancelar</button><button class="btn" id="m-si">Aceptar</button></div></div></div>
+
+<script>
+'use strict';
+/* ===== CONFIGURACIÓN ===== */
+const RULETA_URL = ''; // Introduce aquí la dirección real de la Ruleta de Posturas Sexuales
+const KEY = 'tentaciones_intimas_v1';
+const TOTAL = 27;
+
+/* ===== SECUENCIAS (A=Acción, V=Vale, Q=Pregunta, R=Prenda, C=Chupito) ===== */
+const SECUENCIAS = [
+  'Q1 R A1 C V1 C A2 R Q2 V2 C A3 Q3 V3 Q4 C A4 Q5 A5 R V4 A6 C V5 Q6 C A7'.split(' '),
+  'C V1 R Q1 A1 C Q2 A2 R A3 C V2 R Q3 A4 V3 Q4 R A5 V4 R A6 C Q5 V5 Q6 A7'.split(' ')
+];
+const PILAS = ['A','V','Q','R','C'];
+const PILA_INFO = {
+  A:{nombre:'ACCIÓN',color:'#e0203f'}, V:{nombre:'VALE',color:'#d4af6a'}, Q:{nombre:'PREGUNTA',color:'#a063e0'},
+  R:{nombre:'PRENDA',color:'#e0558f'}, C:{nombre:'BEBES',color:'#d9702e'}
+};
+
+/* ===== TARJETAS ===== */
+const CHUPITO = `BEBES UN CHUPITO`;
+const PRENDA = `PIERDES UNA PRENDA DE ROPA`;
+
+const VALES = [[
+`VALE 1. EL DEDO TRAVIESO 😈
+¡Una petición picante cuando menos se lo espere!
+Este vale te da derecho a pedirle a tu pareja una sesión de placer manual, para que despierte tus sentidos y te haga disfrutar.
+Podrás elegir el momento y el lugar cuando menos se lo espere para tu petición, convirtiendo cualquier ocasión en una oportunidad para subir la temperatura. Aprovecha alguna ocasión fuera de casa para subir el morbo al límite.
+Tu pareja tendrá que estar dispuesta a seguirte el juego y darte ese placer que tanto deseas y añoras.
+Guarda este vale y prepárate para disfrutar de un orgasmo espontáneo.
+¡Un pequeño gesto puede provocar un gran placer! 🔥`,
+`VALE 2. UN JUGUETE SEXUAL 😈
+¡Un nuevo juguete para despertar nuevas sensaciones!
+Guarda este vale: tienes 30 días para decidir qué juguete sexual quieres que tu pareja te regale.
+Podrás elegir libremente el accesorio que más te apetezca, ya sea para explorar tu propio placer o para descubrir nuevas experiencias juntos.
+¿No tienes claro qué juguete elegir? ¡Perfecto! Podrás invitar a tu pareja a una visita a un sex-shop y recorrer juntos sus tentadoras propuestas hasta encontrar ese juguete que despierte vuestra curiosidad.
+Elige, descubre y atrévete a experimentar… ¡El placer está en vuestras manos! 🔥`,
+`VALE 3. BONDAGE: TÚ MANDAS ⛓️🔥
+¡Es hora de tomar el control y descubrir el placer de dominar!
+Este vale te concede el papel dominante en una sesión de BDSM. Tu pareja se convertirá en tu cómplice sumiso y tú llevarás las riendas de la experiencia, explorando juntos el juego de la dominación, las ataduras, los azotes y las sensaciones intensas.
+Si es vuestra primera aventura en el mundo del BDSM, empezad poco a poco: ataduras suaves, azotes ligeros y juegos de dominación de baja intensidad. Id explorando nuevas sensaciones gradualmente, siempre respetando los límites y las señales de ambos.
+Recuerda: estableced previamente vuestros límites, una palabra de seguridad y acordad cómo detener la sesión en cualquier momento.
+Guarda este vale: tienes 30 días para preparar y disfrutar de esta experiencia.
+Hoy tú pones las reglas. 😈`,
+`VALE 4. PETICIÓN SEXUAL 😈
+¡Esta vez tus deseos se convierten en una propuesta muy tentadora!
+Este vale te concede el privilegio de hacerle a tu pareja una petición de carácter sexual. Podrás proponerle una fantasía, un juego o una experiencia que te gustaría compartir con ella.
+Tu pareja tendrá que escuchar tu propuesta y comprometerse a explorarla contigo… ¡siempre que ambos estéis de acuerdo y os sintáis cómodos!
+Guarda este vale y elige bien tu petición. Tienes 30 días para poner a prueba la imaginación y complicidad de tu pareja.
+¡Atrévete a pedir aquello que llevas tiempo deseando! 🔥`,
+`VALE 5. UN RECUERDO MUY ESPECIAL 🍆🔥
+¡Hay regalos que se olvidan y otros que merece la pena conservar muy de cerca!
+Con este vale conseguirás un regalo verdaderamente único y exclusivo: una réplica del pene de tu pareja. ¡Un recuerdo muy íntimo que podrás conservar y disfrutar siempre que quieras!
+Se trata de crear un molde personalizado que permita reproducir fielmente su forma y tamaño, convirtiéndolo en un juguete erótico muy especial. Podrás utilizarlo para disfrutar de tus momentos de intimidad o incorporarlo a vuestros juegos en pareja.
+Para hacerlo realidad, solo tendrás que visitar una tienda especializada en juguetes eróticos o buscar por Internet los kits que permiten crear réplicas íntimas. Existen diferentes marcas y opciones; Cloneboy es una de las referencias más conocidas.
+Tu misión será organizar todo el proceso y convertir este vale en una experiencia divertida, íntima y diferente.
+Porque hay recuerdos que se guardan en fotografías… y otros que se pueden tocar. 😈`
+],[
+`VALE 1. SEXTING 🔥
+¡Es hora de subir la temperatura!
+Guarda este vale: tienes 30 días para disfrutarlo.
+Con este vale podrás pedirle a tu pareja que practique el sexting enviándote 2 fotografías eróticas, cuando estés en el trabajo.
+La primera, a su elección: tu pareja decidirá qué fotografía provocadora quiere hacerse y te la enviará para sorprenderte.
+La segunda, a tu elección: podrás pedirle cómo quieres que pose, qué quieres que muestre y cómo deseas que se fotografíe especialmente para ti.`,
+`VALE 2. PETICIÓN SEXUAL 😈
+¡Esta vez tus deseos se convierten en una propuesta muy tentadora!
+Este vale te concede el privilegio de hacerle a tu pareja una petición de carácter sexual. Podrás proponerle una fantasía, un juego o una experiencia que te gustaría compartir con ella.
+Tu pareja tendrá que escuchar tu propuesta y comprometerse a explorarla contigo… ¡siempre que ambos estéis de acuerdo y os sintáis cómodos!
+Guarda este vale y elige bien tu petición. Tienes 30 días para poner a prueba la imaginación y complicidad de tu pareja.
+¡Atrévete a pedir aquello que llevas tiempo deseando! 🔥`,
+`VALE 3. MARATÓN DE PLACER 🔥
+¡Siete días y una misión: llegar al máximo placer!
+Este vale te da derecho a disfrutar de una semana de auténtico placer intenso. Envíale este vale a tu pareja cuando estés preparado para aceptar el reto y dejarte explotar durante siete días consecutivos.
+La misión de tu pareja será conseguir que disfrutes de al menos un orgasmo diario durante 7 días seguidos. Para conseguirlo, podrá utilizar todas las técnicas que quiera: besos, caricias, masturbación, sexo oral, penetración o cualquier otra forma de daros placer.
+Pero aquí no termina el desafío…
+Si tu cuerpo responde y ambos tenéis ganas de ir un paso más allá, podrás proponerle aumentar el reto a ¡dos orgasmos diarios!
+Guarda este vale hasta que estés preparado para comenzar. Una vez activado, empieza la cuenta atrás de siete días de placer.
+¡Que empiece el maratón! Tu único objetivo será disfrutar… y el de tu pareja, hacer que no quieras que terminen los 7 días. 😈`,
+`VALE 4. TENSIÓN EN EL SOFÁ 🎬🔥
+¡Una película, dos cuerpos desnudos y mucha tensión por resolver!
+Con este vale pondréis a prueba vuestra complicidad y capacidad para jugar con el deseo sin necesidad de llegar inmediatamente al final.
+Elige una película o serie con contenido erótico, pero sin llegar al porno. Esta vez queremos tensión sexual, escenas sugerentes y mucha imaginación. ¡El porno lo dejamos para otra ocasión!
+Invita a tu pareja a disfrutar de la película contigo en el sofá… y con una condición especial: los dos estaréis completamente desnudos.
+Deja que la historia haga su trabajo. Las escenas más subidas de tono pueden despertar vuestro deseo y provocar alguna reacción inesperada, como una erección de él. Aprovechad esos momentos para intercambiar caricias, besos, miradas y pequeños juegos que aumenten poco a poco la tensión, pero con una regla: nada de llegar al orgasmo antes de que termine la película.
+Cuando aparezcan los créditos finales, habrá llegado el momento de dejar de contenerse y dar rienda suelta a vuestro deseo, disfrutando juntos como más os apetezca.
+¡Primero la tensión, después la pasión! ¿Seréis capaces de aguantar hasta el final de la película? 😈`,
+`VALE 5. SESIÓN DE FOTOS ERÓTICAS 📸🔥
+¡Prepara tu cámara, despierta tu creatividad y conviértete en fotógrafo erótico por un día!
+Este vale te da la oportunidad de convertirte en fotógrafo y protagonista de una sesión muy especial. Tendrás que organizar una auténtica sesión fotográfica erótica, cuidando cada detalle: el ambiente, la iluminación, la música, los atrezzos y, por supuesto, los diferentes escenarios.
+Podéis dividir la sesión en tres niveles, con 5 o 6 fotografías por nivel:
+NIVEL 1. SENSUAL: fotografías sugerentes, poses sensuales y miradas que lo dicen todo.
+NIVEL 2. ERÓTICO: fotografías mucho más atrevidas, donde la sensualidad deja paso a la provocación y a los deseos más íntimos.
+NIVEL 3. A DÚO: fotografías eróticas de ambos, capturando vuestra complicidad, pasión y química como pareja.
+Tienes 30 días para organizar el evento, preparar todos los detalles y sorprender a tu pareja con una auténtica sesión fotográfica profesional.
+¡Luces, cámara y mucha pasión! Esta vez, vuestro deseo será el protagonista de cada fotografía. 😈`
+]];
+
+const ACCIONES = [[
+`ACCIÓN 1. 🔥 DESPIERTA SU DESEO
+Acércate a tu pareja y acaricia sus zonas más íntimas por encima de la ropa. Juega con la presión, los movimientos y las caricias hasta conseguir despertar su deseo y provocar una erección.
+¡Tienes que conseguir que su cuerpo hable por sí solo! 😈`,
+`ACCIÓN 2. 😈 EL JUGUETE SECRETO
+Elige un plug anal e introdúcelo a tu pareja para que lo lleve puesto durante el resto de la partida.
+Si el juguete dispone de control remoto, ¡la diversión está asegurada! Tendrás el mando y podrás activar sus vibraciones en cualquier momento del juego, incluso cuando menos se lo espere.
+¡Un pequeño secreto bajo la ropa que puede convertir cualquier turno en una sorpresa muy excitante! 🔥`,
+`ACCIÓN 3. 💋 UN BESO EN SU PUNTO DÉBIL
+Acércate a tu pareja y dale un beso apasionado en la parte de su cuerpo que creas que más le excita.
+Dedícale tiempo, juega con tus labios y sorpréndele con un beso que despierte todos sus sentidos.
+¡Demuestra cuánto conoces sus puntos débiles! 🔥`,
+`ACCIÓN 4. 😈 DEGUSTACIÓN ÍNTIMA
+Dedícate uno o dos minutos de placer: acaríciate e introduce al menos un dedo en tu vagina mientras te masturbas.
+Cuando termine el tiempo, acerca ese dedo a los labios de tu pareja e invítale a saborear tu excitación.
+¡Cuanto más te hayas dejado llevar, más picante y sabrosa será la degustación! 🔥`,
+`ACCIÓN 5. 🔥 RETO SIN MANOS
+Tienes 2 minutos para conseguir provocar una erección en tu pareja sin utilizar las manos.
+Usa tus labios, tu lengua, o la parte de tu cuerpo que quieras y todo tu poder de seducción para despertar su deseo.
+¡Prohibido usar las manos! 😈`,
+`ACCIÓN 6. 👠 CAMBIO DE LOOK: SEDUCCIÓN TOTAL
+¡Es hora de preparar un espectáculo visual para tu pareja!
+Quítate toda la ropa delante de tu pareja y, una vez estés completamente desnuda, sal de la habitación para preparar tu transformación.
+Regresa luciendo tu conjunto de lencería más provocativo y sensual. ¡No olvides los tacones! Son el complemento perfecto para una entrada triunfal.
+A partir de ese momento, deberás permanecer en lencería hasta que termine la partida.
+Pero tienes una ventaja especial: si durante el juego te sale una tarjeta de «Pierdes una prenda», podrás cedérsela a tu pareja, que será quien tenga que cumplir el castigo.
+¡Deslumbra, provoca y convierte tu regreso en un auténtico desfile de seducción! 🔥`,
+`ACCIÓN 7. 📸 SELFIE ERÓTICO: ¡CAPTURA EL MOMENTO!
+¡Ha llegado el momento de inmortalizar una escena muy provocadora!
+Colócate frente a tu pareja mientras él permanece de pie y tú te sitúas de rodillas o en cuclillas delante de él.
+Prepara tu mejor pose, sujeta su pene con una mano y mira directamente a la cámara con una expresión de deseo y picardía.
+El objetivo es conseguir un selfie muy sensual, atrevido y sugerente que capture toda vuestra complicidad.
+¡Una imagen para recordar y una mirada que lo dice absolutamente todo! 😈`
+],[
+`ACCIÓN 1. 💋 CHUPETÓN PARA EL RECUERDO
+¡Vamos a recuperar ese espíritu juvenil y travieso!
+Esta noche tendrás que dejarle a tu pareja una marca de pasión. Ella elegirá la zona donde quiere recibir el chupetón y tú tendrás que poner todo tu arte y dedicación para conseguirlo.
+Eso sí, recuerda que debe ser una zona con la que ambos estéis cómodos y evita las zonas delicadas.
+¡Que el recuerdo de esta noche no desaparezca fácilmente! 😈`,
+`ACCIÓN 2. 🔥 UN MINUTO DE TENTACIÓN
+Colócate detrás de tu pareja, rodea su cuerpo con tus brazos y acaricia suavemente sus pechos mientras llenas de besos su nuca y su cuello.
+Tienes 1 minuto para dedicarle toda tu atención, combinar caricias y besos y despertar poco a poco sus sentidos.
+¡Un minuto puede ser suficiente para ponerle la piel de gallina! 😈`,
+`ACCIÓN 3. 😈 ¡24H SIN ROPA INTERIOR!
+¡Prepárate para pasar un día de lo más atrevido!
+Durante 24 horas tendrás que prescindir de tu ropa interior. Tu pareja será la encargada de elegir tu vestuario, con una condición: las prendas deberán ser lo suficientemente ajustadas o sugerentes como para dejar claro que no llevas nada debajo.
+Lo más divertido será mantener el secreto durante todo el día. Y cuidado con las situaciones inesperadas… ¡porque tendrás que disimular cualquier erección inoportuna!
+¿Quieres subir todavía más la apuesta? Tu pareja también puede aceptar el reto y acompañarte sin ropa interior.
+¡Un secreto compartido, una buena dosis de picardía y todo un día jugando con el riesgo de ser descubiertos! 🔥`,
+`ACCIÓN 4. 🍑 UN MASAJE MUY TENTADOR
+Pide a tu pareja que se tumbe boca abajo y prepárate para dedicarle 2 minutos de placer y relajación.
+Masajea sus glúteos con movimientos lentos y sensuales, alternando caricias suaves con presiones más firmes. ¡Deja que tus manos exploren y conviertan este masaje en un momento de pura tentación!
+¡Dos minutos para relajar su cuerpo y despertar algo más que sus sentidos! 😈`,
+`ACCIÓN 5. 🍓 UN DULCE CAPRICHO
+¡Hoy tu pareja será el postre!
+Extiende un poco de nata montada o sirope comestible sobre sus pezones y disfruta retirándolo lentamente con tu boca y tu lengua.
+Dedícale tiempo a cada caricia, alternando besos, suaves succiones y pequeños mordisquitos delicados para estimular sus sentidos.
+¡Una combinación irresistible de dulzura, sensualidad y placer! 😈`,
+`ACCIÓN 6. 😈 DOS MINUTOS DE PLACER
+¡Es hora de que tomes las riendas!
+Busca un juguete sexual adecuado para la ocasión y utilízalo para masturbar a tu pareja durante 2 minutos, dedicándole toda tu atención y buscando despertar sus sensaciones.
+¡Dos minutos en los que tu única misión será darle placer! 🔥`,
+`ACCIÓN 7. 👅 SABOR A PLACER
+¡Hoy tu pareja será la protagonista de un momento muy íntimo!
+Dedícale 2 minutos de sexo oral, explorando con tu lengua y tus labios para despertar al máximo sus sensaciones, pero con una condición: ¡no debe llegar al orgasmo!
+Cuando termine el tiempo, sube lentamente hacia su rostro y regálale un beso profundo y apasionado, compartiendo la intimidad de ese momento.
+¡Dos minutos de provocación, un beso lleno de complicidad y muchas ganas de más! 😈`
+]];
+
+const PREGUNTAS = [[
+`PREGUNTA 1. LOS PUNTOS DÉBILES
+¿Cuál crees que es la zona del cuerpo de tu pareja más sensible y que más placer le provoca cuando la acaricias?`,
+`PREGUNTA 2. CELOS O MORBO
+¿Te excitaría ver a tu pareja besándose apasionadamente con otra persona? ¿O los celos podrían más que el morbo?`,
+`PREGUNTA 3. LECTURAS PROHIBIDAS
+¿Alguna vez te has masturbado mientras leías una novela erótica? ¡Confiesa!`,
+`PREGUNTA 4. ESTA NOCHE TOCA EXPERIMENTAR
+¿Qué postura sexual te gustaría probar esta misma noche con tu pareja y todavía no habéis practicado?`,
+`PREGUNTA 5. TU PRIMERA VEZ CON EL PORNO
+¿Cuántos años tenías cuando viste tu primera película pornográfica? ¿Recuerdas cómo fue aquella experiencia?`,
+`PREGUNTA 6. FANTASÍAS SECRETAS
+Confiesa una de tus fantasías sexuales más secretas. Esa que quizás todavía no te has atrevido a contarle a tu pareja.`
+],[
+`PREGUNTA 1. ¿CONOCES SUS GUSTOS?
+¿Cuál crees que es el juguete sexual favorito de tu pareja?`,
+`PREGUNTA 2. TU POSTURA FAVORITA
+¿Cuál es tu postura sexual favorita y qué es lo que más te gusta de ella?`,
+`PREGUNTA 3. ¡EL MOMENTO MÁS INCÓMODO!
+¿Alguna vez has tenido una erección involuntaria en público y alguien se ha dado cuenta? ¡Cuenta cómo ocurrió!`,
+`PREGUNTA 4. UN DESEO POR CUMPLIR
+¿Hay algún juguete sexual que te gustaría probar, pero que todavía no has comprado porque te da vergüenza proponérselo a tu pareja? ¡Este es el momento de confesarlo!`,
+`PREGUNTA 5. TU PRIMER OBJETIVO VISUAL
+Cuando ves a una persona que te atrae, ¿en qué parte de su cuerpo te fijas primero?`,
+`PREGUNTA 6. FANTASÍAS SECRETAS
+Confiesa una fantasía sexual que todavía no hayas cumplido y que te encantaría experimentar algún día.`
+]];
+
+const CARTAS = { V:VALES, A:ACCIONES, Q:PREGUNTAS };
+
+/* ===== LOGOTIPOS (SVG) ===== */
+const FLAMA = '<path d="M32 4C39 14 44 19 39 29C37 24 34 24 32 19C30 24 25 26 25 31C20 22 29 15 32 4Z" fill="currentColor"/>';
+const LOGOS = {
+  A:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><g style="color:inherit">'+FLAMA+'</g><path d="M8 44Q18 31 32 38Q46 31 56 44Q46 61 32 58Q18 61 8 44Z" fill="currentColor" fill-opacity=".35"/><path d="M9 44Q32 50 55 44" stroke-width="2"/></svg>',
+  V:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 16H58V28a4 4 0 0 0 0 8V48H6V36a4 4 0 0 0 0-8Z" fill="currentColor" fill-opacity=".18"/><path d="M42 18V46" stroke-dasharray="3 3"/><path d="M24 40C14 33 14 24 21 24C23 24 24 26 24 27C24 26 25 24 27 24C34 24 34 33 24 40Z" fill="currentColor"/></svg>',
+  Q:'<svg viewBox="0 0 64 64" fill="none"><text x="32" y="52" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="54" fill="currentColor">?</text><g transform="translate(34 0) scale(.5)">'+FLAMA+'</g></svg>',
+  R:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 8Q16 30 22 36" /><path d="M50 8Q48 30 42 36"/><path d="M8 34Q8 52 24 52Q32 52 32 40Q32 52 40 52Q56 52 56 34Q44 30 38 36Q32 42 32 40Q32 42 26 36Q20 30 8 34Z" fill="currentColor" fill-opacity=".4"/><path d="M8 34Q20 40 32 40Q44 40 56 34"/></svg>',
+  C:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 6H48C50 24 44 36 32 38C20 36 14 24 16 6Z" fill="currentColor" fill-opacity=".25"/><path d="M16 18Q32 24 48 16" fill="currentColor" fill-opacity=".6"/><path d="M32 38V56M20 58H44"/><circle cx="52" cy="10" r="3" fill="currentColor"/></svg>'
+};
+
+/* ===== UTILIDADES ===== */
+const $ = id => document.getElementById(id);
+let timers = [];
+let state = null;
+let busy = false;
+
+function mostrarPantalla(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+}
+function ask(msg, ok){
+  return new Promise(res => {
+    $('m-txt').textContent = msg; $('m-si').textContent = ok || 'Aceptar';
+    $('modal').classList.add('on');
+    const fin = v => { $('modal').classList.remove('on'); $('m-si').onclick = $('m-no').onclick = null; res(v); };
+    $('m-si').onclick = () => fin(true); $('m-no').onclick = () => fin(false);
+  });
+}
+
+/* ===== PERSISTENCIA ===== */
+function guardarProgreso(){
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+}
+function cargarGuardada(){
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && s.v === 1 && Array.isArray(s.names) && Array.isArray(s.prog)) return s;
+  } catch(e){}
+  return null;
+}
+function borrarGuardada(){ try { localStorage.removeItem(KEY); } catch(e){} }
+
+/* ===== LÓGICA ===== */
+function iniciarPartida(n1, n2){
+  state = { v:1, names:[n1, n2], prog:[0,0], turn:0, phase:'idle', pending:null, done:false };
+  guardarProgreso();
+  construirTablero();
+  mostrarPantalla('s-juego');
+  pintar();
+}
+function jugadorActivo(){ return state.turn; }
+
+function obtenerSiguienteResultado(p){
+  const i = state.prog[p];
+  const code = SEQUENCIAS_SAFE(p)[i];
+  const tipo = code[0], n = parseInt(code.slice(1), 10);
+  let texto;
+  if (tipo === 'C') texto = CHUPITO;
+  else if (tipo === 'R') texto = PRENDA;
+  else texto = CARTAS[tipo][p][n - 1];
+  return { code, tipo, texto, player:p, nTirada:i + 1, fecha:new Date().toLocaleDateString('es-ES') };
+}
+function SEQUENCIAS_SAFE(p){ return SECUENCIAS[p]; }
+
+function comprobarFinal(){
+  if (state.prog[0] >= TOTAL && state.prog[1] >= TOTAL && !state.pending){
+    state.done = true; state.phase = 'done'; guardarProgreso();
+    mostrarFinal(); return true;
+  }
+  return false;
+}
+function avanzarTurno(){
+  state.turn = 1 - state.turn;
+  // Si un jugador ya completó sus 27 (no ocurre con turnos alternos), pasa al otro.
+  if (state.prog[state.turn] >= TOTAL) state.turn = 1 - state.turn;
+}
+
+function realizarTirada(){
+  if (busy || !state || state.phase !== 'idle' || state.done) return;
+  const p = jugadorActivo();
+  if (state.prog[p] >= TOTAL) return;
+  busy = true;
+  const r = obtenerSiguienteResultado(p);
+  // Se guarda el resultado y se incrementa el contador UNA sola vez, antes de animar.
+  state.pending = r; state.prog[p] += 1; state.phase = 'spinning';
+  guardarProgreso(); pintar();
+  animarSeleccion(PILAS.indexOf(r.tipo), false, () => {
+    state.phase = 'card'; guardarProgreso();
+    chispas(); mostrarTarjeta(true);
+  });
+}
+
+function animarSeleccion(destino, rapido, fin){
+  const pilas = [...document.querySelectorAll('.pile')];
+  pilas.forEach(x => x.classList.remove('lit','chosen'));
+  let pos = Math.floor(Math.random() * 5);
+  let pasos = (destino - pos + 5) % 5 + 5 * (rapido ? 2 : 4);
+  let k = 0;
+  const total = pasos;
+  const paso = () => {
+    pilas.forEach(x => x.classList.remove('lit'));
+    pos = (pos + 1) % 5; pilas[pos].classList.add('lit'); k++;
+    if (k >= total){
+      pilas.forEach(x => x.classList.remove('lit'));
+      pilas[destino].classList.add('chosen');
+      timers.push(setTimeout(fin, 900));
+      return;
+    }
+    const t = k / total;
+    const delay = 55 + 420 * t * t * t;
+    timers.push(setTimeout(paso, rapido ? delay * .6 : delay));
+  };
+  paso();
+}
+
+function mostrarTarjeta(animado){
+  const r = state.pending; if (!r) return;
+  const info = PILA_INFO[r.tipo];
+  const c = $('carta');
+  c.style.setProperty('--c', info.color);
+  $('flip').style.setProperty('--c', info.color);
+  document.querySelectorAll('#carta .face').forEach(f => f.style.setProperty('--c', info.color));
+  $('quien').innerHTML = '';
+  const nm = document.createElement('span'); nm.textContent = state.names[r.player];
+  const sm = document.createElement('small'); sm.textContent = 'TIRADA ' + r.nTirada + ' DE ' + TOTAL;
+  $('quien').append(nm, sm);
+  $('dorso').innerHTML = LOGOS[r.tipo]; $('dorso').style.color = info.color;
+  $('cat').textContent = info.nombre;
+  const lineas = r.texto.split('\n');
+  const sc = $('scroll'); sc.innerHTML = ''; sc.scrollTop = 0;
+  sc.classList.toggle('corto', lineas.length === 1);
+  const h = document.createElement('h3'); h.textContent = lineas[0]; sc.appendChild(h);
+  lineas.slice(1).forEach((l, i) => {
+    const p = document.createElement('p'); p.textContent = l;
+    if (i === 0 && r.tipo === 'V') p.className = 'lead';
+    sc.appendChild(p);
+  });
+  const flip = $('flip'), cerrar = $('cerrar');
+  const desc = $('descargas');
+  desc.hidden = r.tipo !== 'V';
+  flip.classList.remove('go'); cerrar.classList.remove('on'); desc.classList.remove('on');
+  c.classList.add('on');
+  if (animado){
+    void flip.offsetWidth;
+    timers.push(setTimeout(() => flip.classList.add('go'), 80));
+    timers.push(setTimeout(() => { cerrar.classList.add('on'); desc.classList.add('on'); }, 1100));
+  } else {
+    flip.style.transition = 'none'; flip.classList.add('go'); void flip.offsetWidth; flip.style.transition = '';
+    cerrar.classList.add('on'); desc.classList.add('on');
+  }
+}
+
+function cerrarTarjeta(){
+  if (!state || state.phase !== 'card') return;
+  $('carta').classList.remove('on');
+  state.pending = null; state.phase = 'idle';
+  avanzarTurno();
+  busy = false;
+  guardarProgreso();
+  document.querySelectorAll('.pile').forEach(x => x.classList.remove('lit','chosen'));
+  if (!comprobarFinal()) pintar();
+}
+
+function recuperarPartida(s){
+  state = s; busy = false;
+  construirTablero();
+  if (state.done){ mostrarFinal(); return; }
+  mostrarPantalla('s-juego'); pintar();
+  if (state.phase === 'spinning' && state.pending){
+    busy = true;
+    animarSeleccion(PILAS.indexOf(state.pending.tipo), true, () => {
+      state.phase = 'card'; guardarProgreso(); mostrarTarjeta(true);
+    });
+  } else if (state.phase === 'card' && state.pending){
+    busy = true; mostrarTarjeta(false);
+  } else { state.phase = 'idle'; state.pending = null; }
+}
+
+function reiniciarJuego(){
+  timers.forEach(clearTimeout); timers = [];
+  borrarGuardada(); state = null; busy = false;
+  $('carta').classList.remove('on');
+  $('n1').value = ''; $('n2').value = ''; validar();
+  mostrarInicio();
+}
+
+/* ===== INTERFAZ ===== */
+function construirTablero(){
+  const t = $('tablero'); t.innerHTML = '';
+  PILAS.forEach(k => {
+    const d = document.createElement('div'); d.className = 'pile'; d.dataset.k = k;
+    d.innerHTML = '<div class="deck" style="--c:'+PILA_INFO[k].color+';color:'+PILA_INFO[k].color+'">'+LOGOS[k]+'<div class="nm">'+PILA_INFO[k].nombre+'</div></div>';
+    t.appendChild(d);
+  });
+}
+function pintar(){
+  if (!state) return;
+  [0,1].forEach(i => {
+    const chip = $('c'+i);
+    chip.querySelector('span').textContent = state.names[i];
+    chip.querySelector('.t').textContent = 'Tirada ' + state.prog[i] + ' / ' + TOTAL;
+    chip.querySelector('.bar div').style.width = (state.prog[i] / TOTAL * 100) + '%';
+    chip.classList.toggle('act', i === state.turn && !state.done);
+  });
+  const sig = Math.min(state.prog[state.turn] + 1, TOTAL);
+  $('turno').textContent = state.phase === 'idle'
+    ? 'Turno de ' + state.names[state.turn] + ' · tirada ' + sig + ' de ' + TOTAL
+    : state.names[state.pending ? state.pending.player : state.turn] + ' está tentando a la suerte…';
+  $('b-tirada').disabled = state.phase !== 'idle';
+  $('b-menu').disabled = state.phase === 'spinning';
+}
+function mostrarFinal(){
+  const p = $('p-ruleta'); p.innerHTML = '';
+  p.append('¿Queréis poner el broche final de una forma diferente? Visitad nuestra ');
+  let el;
+  if (RULETA_URL){ el = document.createElement('a'); el.href = RULETA_URL; el.target = '_blank'; el.rel = 'noopener'; }
+  else { el = document.createElement('span'); }
+  el.className = 'rul'; el.textContent = 'Ruleta de Posturas Sexuales';
+  p.append(el, ' y dejad que el azar elija cómo culminar esta noche de pasión.');
+  mostrarPantalla('s-fin'); confeti();
+}
+function mostrarInicio(){
+  const g = cargarGuardada();
+  $('guardada').hidden = !g; $('formulario').hidden = !!g;
+  mostrarPantalla('s-inicio');
+}
+function validar(){
+  $('b-iniciar').disabled = !($('n1').value.trim() && $('n2').value.trim());
+}
+function chispas(){
+  const pr = document.querySelector('.pile.chosen'); if (!pr) return;
+  const b = pr.getBoundingClientRect();
+  for (let i = 0; i < 18; i++){
+    const s = document.createElement('div'); s.className = 'chispa';
+    s.style.left = (b.left + b.width / 2) + 'px'; s.style.top = (b.top + b.height / 2) + 'px';
+    const a = Math.random() * 6.28, d = 40 + Math.random() * 70;
+    s.style.setProperty('--dx', Math.cos(a) * d + 'px'); s.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    document.body.appendChild(s); setTimeout(() => s.remove(), 1000);
+  }
+}
+function confeti(){
+  const cols = ['#d4af6a','#c4122f','#f3dca0','#7b1230','#a063e0'], em = ['🔥','💋','🌹','❤️','✨'];
+  for (let i = 0; i < 46; i++){
+    const f = document.createElement('div'); f.className = 'fx';
+    f.style.left = Math.random() * 100 + 'vw';
+    f.style.animationDuration = (3 + Math.random() * 3) + 's'; f.style.animationDelay = Math.random() * 2 + 's';
+    if (i % 3 === 0){ f.textContent = em[i % em.length]; f.style.fontSize = '1.4rem'; }
+    else { f.style.width = '8px'; f.style.height = '14px'; f.style.background = cols[i % cols.length]; }
+    document.body.appendChild(f); setTimeout(() => f.remove(), 7000);
+  }
+}
+
+/* ===== DESCARGA DE VALES (imagen PNG / PDF) ===== */
+function envolver(ctx, texto, maxW){
+  const out = []; let linea = '';
+  texto.split(' ').forEach(w => {
+    const prueba = linea ? linea + ' ' + w : w;
+    if (ctx.measureText(prueba).width > maxW && linea){ out.push(linea); linea = w; } else linea = prueba;
+  });
+  if (linea) out.push(linea);
+  return out;
+}
+function dibujarVale(r){
+  const W = 1080, M = 80, IW = W - 2 * M - 40;
+  const serif = 'Georgia, "Times New Roman", serif', sans = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const medir = document.createElement('canvas').getContext('2d');
+  const l = r.texto.split('\n');
+  const bloques = [
+    { f:'700 34px '+serif, col:'#d4af6a', txt:'V A L E', al:'center', lh:44, gap:26 },
+    { f:'700 62px '+serif, col:'#f3dca0', txt:l[0], al:'center', lh:76, gap:34 },
+    { f:'italic 40px '+serif, col:'#f3dca0', txt:l[1], al:'center', lh:54, gap:30 }
+  ];
+  l.slice(2).forEach(p => bloques.push({ f:'38px '+sans, col:'#f6e9d7', txt:p, al:'left', lh:54, gap:22 }));
+  bloques.push({ f:'30px '+sans, col:'#d4af6a', txt:'Vale de ' + state.names[r.player] + ' · Obtenido el ' + r.fecha, al:'center', lh:42, gap:0, extra:30 });
+  let H = 2 * M + 20;
+  bloques.forEach(b => {
+    medir.font = b.f; b.lineas = envolver(medir, b.txt, IW);
+    H += b.lineas.length * b.lh + b.gap + (b.extra || 0);
+  });
+  const c = document.createElement('canvas'); c.width = W; c.height = Math.max(H, 1350);
+  const ctx = c.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, W, c.height); g.addColorStop(0, '#4a0c22'); g.addColorStop(1, '#0d0309');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, c.height);
+  ctx.strokeStyle = '#d4af6a'; ctx.lineWidth = 6; ctx.strokeRect(36, 36, W - 72, c.height - 72);
+  ctx.lineWidth = 2; ctx.strokeRect(54, 54, W - 108, c.height - 108);
+  let y = M + 30; ctx.textBaseline = 'alphabetic';
+  bloques.forEach(b => {
+    if (b.extra) y += b.extra;
+    ctx.font = b.f; ctx.fillStyle = b.col; ctx.textAlign = b.al;
+    b.lineas.forEach(ln => { y += b.lh; ctx.fillText(ln, b.al === 'center' ? W / 2 : M + 20, y - 12); });
+    y += b.gap;
+  });
+  return c;
+}
+function nombreArchivo(r, ext){
+  const t = r.texto.split('\n')[0].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const n = state.names[r.player].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return t + (n ? '-' + n : '') + '.' + ext;
+}
+function bajar(blob, nombre){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function crearPDF(c){
+  const b64 = c.toDataURL('image/jpeg', 0.92).split(',')[1], bin = atob(b64), jpg = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) jpg[i] = bin.charCodeAt(i);
+  const pw = 595, ph = Math.round(595 * c.height / c.width), enc = s => new TextEncoder().encode(s);
+  const partes = [], offs = []; let len = 0;
+  const add = x => { const b = typeof x === 'string' ? enc(x) : x; partes.push(b); len += b.length; };
+  const cont = 'q ' + pw + ' 0 0 ' + ph + ' 0 0 cm /Im0 Do Q';
+  add('%PDF-1.4\n');
+  offs[1] = len; add('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  offs[2] = len; add('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+  offs[3] = len; add('3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pw + ' ' + ph + '] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n');
+  offs[4] = len; add('4 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + c.width + ' /Height ' + c.height + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jpg.length + ' >>\nstream\n');
+  add(jpg); add('\nendstream\nendobj\n');
+  offs[5] = len; add('5 0 obj\n<< /Length ' + cont.length + ' >>\nstream\n' + cont + '\nendstream\nendobj\n');
+  const xr = len; let x = 'xref\n0 6\n0000000000 65535 f \n';
+  for (let i = 1; i <= 5; i++) x += String(offs[i]).padStart(10, '0') + ' 00000 n \n';
+  add(x + 'trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n' + xr + '\n%%EOF');
+  return new Blob(partes, { type:'application/pdf' });
+}
+function descargarVale(formato){
+  const r = state && state.pending; if (!r || r.tipo !== 'V') return;
+  const c = dibujarVale(r);
+  if (formato === 'pdf') bajar(crearPDF(c), nombreArchivo(r, 'pdf'));
+  else c.toBlob(b => bajar(b, nombreArchivo(r, 'png')), 'image/png');
+}
+$('d-img').addEventListener('click', () => descargarVale('png'));
+$('d-pdf').addEventListener('click', () => descargarVale('pdf'));
+
+/* ===== EVENTOS ===== */
+$('n1').addEventListener('input', validar); $('n2').addEventListener('input', validar);
+$('b-iniciar').addEventListener('click', () => {
+  const a = $('n1').value.trim(), b = $('n2').value.trim();
+  if (a && b) iniciarPartida(a, b);
+});
+$('b-continuar').addEventListener('click', () => { const g = cargarGuardada(); if (g) recuperarPartida(g); });
+$('b-nueva').addEventListener('click', async () => {
+  if (await ask('Ya existe una partida guardada. Si empiezas una nueva se borrará el progreso anterior. ¿Continuar?', 'Borrar y empezar')){
+    borrarGuardada(); $('guardada').hidden = true; $('formulario').hidden = false;
+  }
+});
+$('b-tirada').addEventListener('click', realizarTirada);
+$('cerrar').addEventListener('click', cerrarTarjeta);
+async function pedirNueva(){
+  if (await ask('¿Seguro que quieres abandonar esta partida y empezar una nueva? Se perderá el progreso.', 'Nueva partida')) reiniciarJuego();
+}
+$('b-menu').addEventListener('click', pedirNueva);
+$('b-fin-nueva').addEventListener('click', pedirNueva);
+
+/* ===== ARRANQUE ===== */
+(function(){
+  const g = cargarGuardada();
+  if (g && g.phase === 'idle' && !g.done && g.prog[0] === 0 && g.prog[1] === 0){ /* partida sin empezar: se ofrece igualmente */ }
+  validar(); mostrarInicio();
+})();
+</script>
+</body>
+</html>
